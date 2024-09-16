@@ -30,9 +30,9 @@ const register = async (userName, email, password) => {
     }
 };
 
-const login = async (userName, password) => {
+const login = async (email, password) => {
     try {
-        const user = await User.findOne({ userName });
+        const user = await User.findOne({ email });
         if (!user) throw new Error('User not found');
 
         const isValidPassword = await bcrypt.compare(password, user.passwordHash);

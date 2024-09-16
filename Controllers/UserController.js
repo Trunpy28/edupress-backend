@@ -12,9 +12,9 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
     try {
-        const { userName, password } = req.body;
-        const { accessToken, refreshToken } = await UserService.login(userName, password);
-        
+        const { email, password } = req.body;
+        const { accessToken, refreshToken } = await UserService.login(email, password);
+
         // Gửi refresh token qua cookie HttpOnly
         res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
