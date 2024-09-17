@@ -63,4 +63,12 @@ const refreshToken = async (refreshToken) => {
     }
 };
 
-export default { register, login, refreshToken };
+const getUser = async () => {
+    try {
+        return await User.find();
+    } catch (error) {
+        throw new Error('Error retrieving users: ' + error.message);
+    }
+}
+
+export default { register, login, refreshToken, getUser };

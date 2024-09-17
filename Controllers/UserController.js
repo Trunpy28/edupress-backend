@@ -52,3 +52,12 @@ export const refreshUserToken = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+export const getUser = async (req, res) => {
+    try {
+        const users = await UserService.getUser();
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
