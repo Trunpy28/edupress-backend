@@ -13,7 +13,7 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const { accessToken, refreshToken } = await UserService.login(email, password);
+        const { accessToken, refreshToken, role } = await UserService.login(email, password);
 
         // Gửi refresh token qua cookie HttpOnly
         res.cookie('refresh_token', refreshToken, {
@@ -22,7 +22,11 @@ export const loginUser = async (req, res) => {
             sameSite: 'Strict',
         });
 
-        res.status(200).json({ accessToken });
+        if (role === 'Admin') {
+            res.status(200).json({ accessToken, role });
+        } else {
+            res.status(200).json({ accessToken, message: 'User login successful, but no admin access' });
+        }
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

@@ -41,7 +41,7 @@ const login = async (email, password) => {
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
 
-        return { accessToken, refreshToken };
+        return { accessToken, refreshToken, role: user.role };
     } catch (error) {
         throw new Error('Login failed: ' + error.message);
     }
