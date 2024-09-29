@@ -71,4 +71,45 @@ const getUser = async () => {
     }
 }
 
-export default { register, login, refreshToken, getUser };
+const deleteUser = async (id) => {
+    try {
+        const deletedUser = await User.findByIdAndDelete(id);
+        if (!deletedUser) {
+            throw new Error('User not found');
+        }
+        return { message: 'User deleted successfully' };
+    } catch (error) {
+        throw new Error('Error deleting user: ' + error.message);
+    }
+}
+
+const createAdmin = async (userName, email, password) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        throw new Error('Invalid email format');
+    }
+
+    const existingUser = await User.findOne({ $or: [{ userName }, { email }] });
+    if (existingUser) {
+        throw new Error('User already exists with this username or email');
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const admin = new User({
+            userName,
+            email,
+            passwordHash: hashedPassword,
+            role: 'Admin',
+        });
+        await admin.save();
+        return {
+            userName,
+            email,
+        };
+    } catch (error) {
+        throw new Error('Failed to create admin: ' + error.message);
+    }
+};
+
+export default { register, login, refreshToken, getUser, deleteUser, createAdmin };

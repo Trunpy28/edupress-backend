@@ -61,3 +61,23 @@ export const getUser = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 }
+
+export const deleteUser = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const result = await UserService.deleteUser(id);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+export const createAdmin = async (req, res) => {
+    const { userName, email, password } = req.body;
+    try {
+        const newAdmin = await UserService.createAdmin(userName, email, password);
+        res.status(201).json({ message: 'Admin created successfully', admin: newAdmin });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};

@@ -18,12 +18,13 @@ const CourseSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    price:{
+    price: {
         type: Number,
         required: true
     },
     discountPrice: {
         type: Number,
+        default: 0
     },
     image: {
         type: String,
@@ -33,7 +34,7 @@ const CourseSchema = new mongoose.Schema({
         type: String,
         required: true
     }
-},{
+}, {
     timestamps: true
 })
 
