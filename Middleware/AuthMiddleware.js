@@ -15,3 +15,13 @@ export const authMiddleware = (req, res, next) => {
         return res.status(403).json({ message: 'Invalid or expired token' });
     }
 };
+
+// export const verifyAdmin = (req, res, next) => {
+//     const userRole = req.user.role;
+//     if (userRole === "Admin") {
+//         next();
+//     }
+//     else {
+//         return res.status(403).json({ message: 'You do not have permission to access this resource' });
+//     }
+// }
