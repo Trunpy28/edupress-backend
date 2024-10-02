@@ -16,6 +16,28 @@ export const registerUser = async (req, res) => {
     }
 };
 
+export const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const { accessToken, refreshToken, role } = await UserService.login(email, password);
+
+        // Gửi refresh token qua cookie HttpOnly
+        res.cookie('refresh_token', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Chỉ gửi qua HTTPS trong môi trường sản xuất
+            sameSite: 'Strict',
+        });
+
+        if (role === 'Admin') {
+            res.status(200).json({ accessToken, role });
+        } else {
+            res.status(200).json({ accessToken, message: 'User login successful, but no admin access' });
+        }
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
 export const loginUserName = async (req, res) => {
     try {
         const { userName, password } = req.body;
@@ -28,7 +50,11 @@ export const loginUserName = async (req, res) => {
             sameSite: 'Strict',
         });
 
-        res.status(200).json({ accessToken });
+        if (role === 'Admin') {
+            res.status(200).json({ accessToken, role });
+        } else {
+            res.status(200).json({ accessToken, message: 'User login successful, but no admin access' });
+        }
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -68,6 +94,15 @@ export const getUserProfile = async (req, res) => {
     }
 }
 
+export const getUser = async (req, res) => {
+    try {
+        const users = await UserService.getUser();
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
 export const updateAvatar = async (req, res) => {
     try {
         const userId = req.user.id;
@@ -80,6 +115,16 @@ export const updateAvatar = async (req, res) => {
         res.status(200).json({ avatarUrl: fileUrl });
     }
     catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+export const deleteUser = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const result = await UserService.deleteUser(id);
+        res.status(200).json(result);
+    } catch (error) {
         res.status(400).json({ message: error.message });
     }
 }
@@ -99,3 +144,13 @@ export const updateUserProfile = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 }
+
+export const createAdmin = async (req, res) => {
+    const { userName, email, password } = req.body;
+    try {
+        const newAdmin = await UserService.createAdmin(userName, email, password);
+        res.status(201).json({ message: 'Admin created successfully', admin: newAdmin });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};

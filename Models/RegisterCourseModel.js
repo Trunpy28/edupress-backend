@@ -6,7 +6,7 @@ const RegisterCourseSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User"
     },
-    coureseId: {
+    courseId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course"
     },
