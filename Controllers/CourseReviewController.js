@@ -11,10 +11,10 @@ export const createReview = async (req, res) => {
     const { courseId, rating, review } = req.body;
     const userId = req.user.id;
 
-    const confirmed = await CourseService.isCourseConfirmed(userId, courseId);
-    if (!confirmed) {
-      return res.status(403).json({ message: 'You have not confirmed completion of this course, you cannot leave a review.' });
-    }
+    // const confirmed = await CourseService.isCourseConfirmed(userId, courseId);
+    // if (!confirmed) {
+    //   return res.status(403).json({ message: 'You have not confirmed completion of this course, you cannot leave a review.' });
+    // }
 
     const newReview = await CourseReviewService.createReview(userId, courseId, rating, review);
     return res.status(201).json({ message: 'Review created successfully', review: newReview });
@@ -52,7 +52,7 @@ export const getReviewsByCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
     const reviews = await CourseReviewService.getReviewsByCourse(courseId);
-    return res.status(200).json({ reviews });
+    return res.status(200).json(reviews);
   } catch (error) {
     return res.status(500).json({ message: 'Error fetching reviews', error: error.message });
   }
@@ -64,10 +64,10 @@ export const deleteReview = async (req, res) => {
       return res.status(401).json({ message: 'User not logged in' });
     }
 
-    const { courseId } = req.body;
+    const reviewId = req.params.id;
     const userId = req.user.id;
 
-    const existingReview = await CourseReview.findOne({ userId, courseId });
+    const existingReview = await CourseReview.findById(reviewId);
     if (!existingReview) {
       return res.status(404).json({ message: 'Review not found' });
     }
@@ -76,7 +76,7 @@ export const deleteReview = async (req, res) => {
       return res.status(403).json({ message: 'You are not authorized to delete this review' });
     }
 
-    const deletedReview = await CourseReviewService.deleteReview(userId, courseId);
+    const deletedReview = await CourseReviewService.deleteReview(reviewId);
     return res.status(200).json({ message: 'Review deleted successfully', review: deletedReview });
   } catch (error) {
     return res.status(500).json({ message: 'Error deleting review', error: error.message });

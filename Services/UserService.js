@@ -30,7 +30,7 @@ const register = async (userName, email, password) => {
     }
 };
 
-const login = async (userName, password) => {
+const loginUserName = async (userName, password) => {
     try {
         const user = await User.findOne({ userName });
         if (!user) throw new Error('User not found');
@@ -63,4 +63,48 @@ const refreshToken = async (refreshToken) => {
     }
 };
 
-export default { register, login, refreshToken };
+const getUserProfile = async (id) => {
+    try {
+        const user = await User.findById(id);
+        if (!user) throw new Error('User not found');
+        return {
+            userName: user.userName,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            avatarUrl: user.avatarUrl
+        }
+    }
+    catch (error){
+        throw new Error('Error retrieving user profile');
+    }
+}
+
+const updateAvatar = async (id, avatarUrl) => {
+    try {
+        await User.findByIdAndUpdate(id, {
+            avatarUrl
+        })
+    }
+    catch(error){
+        throw new Error('Error updating avatar');
+    }
+}
+
+export const updateUserProfile = async (id, newInfo) => {
+    try {      
+        const updatedUser = await User.findByIdAndUpdate(id, newInfo, { new: true });
+        return {
+            userName: updatedUser.userName,
+            email: updatedUser.email,
+            name: updatedUser.name,
+            role: updatedUser.role,
+            avatarUrl: updatedUser.avatarUrl
+        }
+    }
+    catch (error) {
+        throw new Error('Error updating user info');
+    }
+}
+
+export default { register, loginUserName, refreshToken, getUserProfile, updateAvatar, updateUserProfile };

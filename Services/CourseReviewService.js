@@ -16,12 +16,12 @@ const updateReview = async (userId, courseId, rating, review) => {
 const getReviewsByCourse = async (courseId) => {
   return await CourseReview.find({ courseId }).populate({
     path: 'userId',
-    select: 'name _id',
+    select: 'name _id email',
   });
 };
 
-const deleteReview = async (userId, courseId) => {
-  return await CourseReview.findOneAndDelete({ userId, courseId });
+const deleteReview = async (reviewId) => {
+  return await CourseReview.findByIdAndDelete(reviewId);
 };
 
 export default {
