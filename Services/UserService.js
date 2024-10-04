@@ -64,6 +64,19 @@ const login = async (email, password) => {
     }
 };
 
+const logout = async (refreshToken) => {
+    try {
+        const decoded = validateRefreshToken(refreshToken);
+        if (!decoded) throw new Error('Invalid refresh token');
+
+        await User.updateOne({ _id: decoded.id }, { $pull: { refreshTokens: refreshToken } });
+
+        return { message: 'Logout successful' };
+    } catch (error) {
+        throw new Error('Logout failed: ' + error.message);
+    }
+};
+
 const refreshToken = async (refreshToken) => {
     try {
         const decoded = validateRefreshToken(refreshToken);
@@ -92,7 +105,7 @@ const getUserProfile = async (id) => {
             avatarUrl: user.avatarUrl
         }
     }
-    catch (error){
+    catch (error) {
         throw new Error('Error retrieving user profile');
     }
 }
@@ -103,13 +116,13 @@ const updateAvatar = async (id, avatarUrl) => {
             avatarUrl
         })
     }
-    catch(error){
+    catch (error) {
         throw new Error('Error updating avatar');
     }
 }
 
 export const updateUserProfile = async (id, newInfo) => {
-    try {      
+    try {
         const updatedUser = await User.findByIdAndUpdate(id, newInfo, { new: true });
         return {
             userName: updatedUser.userName,
@@ -173,4 +186,13 @@ const createAdmin = async (userName, email, password) => {
     }
 };
 
-export default { register, login, loginUserName, refreshToken, getUserProfile, updateAvatar, updateUserProfile, getUser, deleteUser, createAdmin };
+const getTotalUsers = async () => {
+    try {
+        const totalUsers = await User.countDocuments();
+        return totalUsers;
+    } catch (error) {
+        throw new Error(`Error fetching total users: ${error.message}`);
+    }
+};
+
+export default { register, login, logout, loginUserName, refreshToken, getUserProfile, updateAvatar, updateUserProfile, getUser, deleteUser, createAdmin, getTotalUsers };

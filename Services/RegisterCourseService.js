@@ -24,4 +24,14 @@ const updateRegistrationStatus = async (id, status) => {
     }
 };
 
-export default { getAllRegistrations, updateRegistrationStatus };
+const getNewRegistrations = async () => {
+    try {
+        const last7Days = new Date(new Date().setDate(new Date().getDate() - 7));
+        const newRegistrations = await Registration.find({ createdAt: { $gte: last7Days } });
+        return newRegistrations.length;
+    } catch (error) {
+        throw new Error(`Error fetching new registrations: ${error.message}`);
+    }
+};
+
+export default { getAllRegistrations, updateRegistrationStatus, getNewRegistrations };

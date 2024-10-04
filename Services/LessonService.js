@@ -10,9 +10,10 @@ const createLesson = async (data) => {
     }
 };
 
-const getAllLessons = async () => {
+const getAllLessons = async (courseId) => {
     try {
-        return await Lesson.find().populate('courseId');
+        const filter = courseId ? { courseId } : {};
+        return await Lesson.find(filter).populate('courseId');
     } catch (error) {
         throw new Error('Error fetching lessons: ' + error.message);
     }

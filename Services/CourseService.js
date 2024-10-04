@@ -30,16 +30,16 @@ const getCourses = async (queries) => {
     limit = 10,
   } = queries;
 
-  if(typeof page === "string") {
+  if (typeof page === "string") {
     page = parseInt(page);
-    if(isNaN(page) || page < 1) page = 1;
+    if (isNaN(page) || page < 1) page = 1;
   }
 
-  if(typeof limit === "string") {
+  if (typeof limit === "string") {
     limit = parseInt(limit);
-    if(isNaN(limit) || limit < 1 || limit > 100) limit = 10;
+    if (isNaN(limit) || limit < 1 || limit > 100) limit = 10;
   }
-  
+
   try {
     let query = Course.find();
     if (search) {
@@ -92,7 +92,7 @@ const getCourses = async (queries) => {
           break;
       }
     }
-    
+
     const courses = await query.skip((page - 1) * limit).limit(limit).exec();
 
     return { courses, totalCourses };
@@ -195,6 +195,15 @@ const isCourseConfirmed = async (userId, courseId) => {
   return registration !== null;
 };
 
+const getTotalCourses = async () => {
+  try {
+    const totalCourses = await Course.countDocuments();
+    return totalCourses;
+  } catch (error) {
+    throw new Error(`Error fetching total courses: ${error.message}`);
+  }
+};
+
 export default {
   getCourses,
   getCourseById,
@@ -203,5 +212,6 @@ export default {
   createCourses,
   updateCourse,
   deleteCourse,
-  isCourseConfirmed
+  isCourseConfirmed,
+  getTotalCourses
 };

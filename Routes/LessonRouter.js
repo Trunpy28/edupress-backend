@@ -4,7 +4,7 @@ import { authMiddleware } from '../Middleware/AuthMiddleware.js';
 
 const router = express.Router();
 
-router.post('/', authMiddleware, createLesson);
+router.post('/add-lesson', authMiddleware, createLesson);
 router.get('/', getAllLessons);
 router.get('/:id', getLessonById);
 router.put('/:id', authMiddleware, updateLesson);

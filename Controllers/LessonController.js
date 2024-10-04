@@ -10,11 +10,12 @@ export const createLesson = async (req, res) => {
 };
 
 export const getAllLessons = async (req, res) => {
+    const { courseId } = req.query;
     try {
-        const lessons = await LessonService.getAllLessons();
-        res.status(200).json(lessons);
+        const lessons = await LessonService.getAllLessons(courseId);
+        res.json(lessons);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: 'Error fetching lessons: ' + error.message });
     }
 };
 

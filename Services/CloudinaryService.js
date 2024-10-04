@@ -13,7 +13,7 @@ export const uploadFile = async (file) => {
 
     const dataUrl = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
     const fileName = file.originalname.substring(0, file.originalname.lastIndexOf('.'));
-    
+
     try {
         const result = await cloudinary.uploader.upload(dataUrl, {
             public_id: fileName,
@@ -21,7 +21,7 @@ export const uploadFile = async (file) => {
             folder: 'Edupress',
             overwrite: true
         });
-        
+
         return result.secure_url;
     } catch (err) {
         throw new Error(`Upload failed: ${err.message}`);
@@ -56,4 +56,29 @@ export const uploadFiles = async (listFile) => {
     return { listResult, errorList };
 };
 
-export default { uploadFile, uploadFiles }
+export const uploadFromBuffer = async (req, res, next) => {
+    const file = req.file;
+
+    if (!file) {
+        return res.status(400).json({ error: 'There is no file to upload' });
+    }
+
+    const dataUrl = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+    const fileName = file.originalname.substring(0, file.originalname.lastIndexOf('.'));
+
+    try {
+        const result = await cloudinary.uploader.upload(dataUrl, {
+            public_id: fileName,
+            resource_type: 'auto',
+            folder: 'Edupress',
+            overwrite: true
+        });
+
+        req.body.image = result.secure_url;
+        next();
+    } catch (err) {
+        return res.status(500).json({ error: `Upload failed: ${err.message}` });
+    }
+};
+
+export default { uploadFile, uploadFiles, uploadFromBuffer }

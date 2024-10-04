@@ -1,7 +1,8 @@
 import CourseService from '../Services/CourseService.js';
+import { uploadFile } from '../Services/CloudinaryService.js';
 
-export const getCourses = async (req, res) => {  
-  try {  
+export const getCourses = async (req, res) => {
+  try {
     const result = await CourseService.getCourses(req.query);
     res.status(200).json(result);
   } catch (error) {
@@ -38,10 +39,29 @@ export const createCourse = async (req, res) => {
     if (!req.user) {
       return res.status(401).json({ message: 'User not logged in' });
     }
-    if(req.user.role !== 'Admin') return res.status(403).json({ message: 'You are not allowed to create course' });
+    if (req.user.role !== 'Admin') return res.status(403).json({ message: 'You are not allowed to create course' });
 
-    const newCourse = await CourseService.createCourse(req.body);
-    res.status(201).json(newCourse);
+    const { name, level, category, price, discountPrice, urlSlug, description } = req.body;
+    let imageUrl = null;
+
+    if (req.file) {
+      imageUrl = await uploadFile(req.file);
+    }
+    const newCourse = await CourseService.createCourse({
+      name,
+      level,
+      category,
+      price,
+      discountPrice,
+      urlSlug,
+      description,
+      image: imageUrl
+    });
+    res.status(201).json({
+      message: 'Course created successfully',
+      course: newCourse
+    });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -52,8 +72,8 @@ export const createCourseMany = async (req, res) => {
     if (!req.user) {
       return res.status(401).json({ message: 'User not logged in' });
     }
-    if(req?.user?.role !== 'Admin') return res.status(403).json({ message: 'You are not allowed to create courses' });
-    
+    if (req?.user?.role !== 'Admin') return res.status(403).json({ message: 'You are not allowed to create courses' });
+
     const newCourses = await CourseService.createCourses(req.body);
     res.status(201).json(newCourses);
   } catch (error) {
@@ -80,6 +100,15 @@ export const deleteCourse = async (req, res) => {
       return res.status(404).json({ message: 'Course not found' });
     }
     res.status(200).json({ message: 'Course deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getTotalCourses = async (req, res) => {
+  try {
+    const totalCourses = await CourseService.getTotalCourses();
+    res.status(200).json({ totalCourses });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

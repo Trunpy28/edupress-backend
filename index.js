@@ -9,7 +9,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors({
-    origin: 'http://localhost:3001', // Địa chỉ frontend React
+    origin: 'http://localhost:5173', // Địa chỉ frontend React
     credentials: true, // Cho phép gửi cookie
 }));
 
@@ -20,13 +20,13 @@ app.use(express.urlencoded({ extended: true }));
 routes(app);
 
 mongoose.connect(process.env.MONGODB_URI)
-    .then(()=>{
+    .then(() => {
         console.log('Connected to Db Successfully');
     })
-    .catch((err)=>{
+    .catch((err) => {
         console.log(err);
     })
 
-app.listen(process.env.PORT, ()=>{
+app.listen(process.env.PORT, () => {
     console.log('Server is running in port: ' + process.env.PORT);
 })

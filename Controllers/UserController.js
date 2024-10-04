@@ -4,7 +4,7 @@ import CloudinaryService from '../Services/CloudinaryService.js';
 export const registerUser = async (req, res) => {
     try {
         const { userName, email, password, confirmPassword } = req.body;
-        
+
         if (password !== confirmPassword) {
             return res.status(400).json({ message: "Passwords do not match" });
         }
@@ -38,11 +38,26 @@ export const loginUser = async (req, res) => {
     }
 };
 
+export const logout = async (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return res.status(400).json({ message: 'Refresh token is required' });
+    }
+
+    try {
+        const result = await UserService.logout(refreshToken);
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 export const loginUserName = async (req, res) => {
     try {
         const { userName, password } = req.body;
         const { accessToken, refreshToken } = await UserService.loginUserName(userName, password);
-        
+
         // Gửi refresh token qua cookie HttpOnly
         res.cookie('refresh_token', refreshToken, {
             httpOnly: true,
@@ -73,7 +88,7 @@ export const logoutUser = (req, res) => {
 
 export const refreshUserToken = async (req, res) => {
     try {
-        
+
         const token = req.cookies.refresh_token; // Lấy refresh token từ cookie
         const newAccessToken = await UserService.refreshToken(token);
         res.status(200).json(newAccessToken);
@@ -108,10 +123,10 @@ export const updateAvatar = async (req, res) => {
         const userId = req.user.id;
         if (!userId) return res.status(401).json({ message: 'User does not exist' });
         const avatarFile = req.file;
-        
+
         const fileUrl = await CloudinaryService.uploadFile(avatarFile);
         await UserService.updateAvatar(userId, fileUrl);
-        
+
         res.status(200).json({ avatarUrl: fileUrl });
     }
     catch (error) {
@@ -135,10 +150,10 @@ export const updateUserProfile = async (req, res) => {
         if (!userId) return res.status(401).json({ message: 'User does not exist' });
 
         const { name } = req.body;
-        
+
         const updatedUser = await UserService.updateUserProfile(userId, { name });
 
-        return res.status(200).json({updatedUser});
+        return res.status(200).json({ updatedUser });
     }
     catch (error) {
         res.status(400).json({ message: error.message });
@@ -152,5 +167,14 @@ export const createAdmin = async (req, res) => {
         res.status(201).json({ message: 'Admin created successfully', admin: newAdmin });
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+};
+
+export const getTotalUsers = async (req, res) => {
+    try {
+        const totalUsers = await UserService.getTotalUsers();
+        res.status(200).json({ totalUsers });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
